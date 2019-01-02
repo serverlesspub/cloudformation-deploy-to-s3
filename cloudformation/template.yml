@@ -73,7 +73,7 @@ Resources:
         S3Bucket: DEPLOYMENT_BUCKET_NAME
         S3Key: DEPLOYMENT_KEY/function.zip
       Runtime: python3.6 
-      Handler: deployer.hello
+      Handler: deployer.handler
       Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
