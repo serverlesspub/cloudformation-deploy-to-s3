@@ -1,0 +1,6 @@
+.vscode
+.DS_Store
+.idea
+output.yml
+build
+output.txt
