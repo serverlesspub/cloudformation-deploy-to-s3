@@ -1,10 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: S3 Deployment Layer
 Parameters:
-  AllowedPrincipal:
-    Type: String
-    Description: Account principal allowed to deploy this layer
-    Default: '*'
   DeploymentBucketName:
     Type: String
   DeploymentKey:
@@ -28,7 +24,7 @@ Resources:
     Properties:
       Action: lambda:GetLayerVersion
       LayerVersionArn: !Ref S3DeploymentLayer
-      Principal: !Ref AllowedPrincipal
+      Principal: '*'
 
 Outputs:
   Arn: 
