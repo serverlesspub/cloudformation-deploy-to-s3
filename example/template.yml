@@ -16,7 +16,7 @@ Resources:
       Layers: 
         # the layer contains the deployment code 
         # so the function "source" can just contain the web assets
-        - arn:aws:lambda:us-east-1:145266761615:layer:s3-deployment:2
+        - arn:aws:lambda:us-east-1:145266761615:layer:s3-deployment:4
 
       # point to directory with the assets so cloudformation can
       # package and upload them
@@ -39,8 +39,13 @@ Resources:
       # give the function access to the bucket where it
       # will upload the assets
       Policies:
-      - S3CrudPolicy:
-          BucketName: !Ref TargetBucket
+        - Version: '2012-10-17' # Policy Document
+          Statement:
+            - Effect: Allow
+              Action:
+              - s3:PutObject
+              - s3:PutObjectACL
+              Resource: !Sub 'arn:aws:s3:::${TargetBucket}/*'
 
   # This is a custom resource that
   # will trigger the function during deployment
