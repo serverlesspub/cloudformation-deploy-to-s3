@@ -7,7 +7,8 @@ Resources:
     Type: AWS::S3::Bucket
 
   # this function is used only during deployment, 
-  # enabling cloudformation to pack up the web site source and assets
+  # we use the web site assets as the source of the function
+  # tricking cloudformation to pack up the web site files
   # using the standard cloudformation package process
   SiteSource:
     Type: AWS::Serverless::Function
