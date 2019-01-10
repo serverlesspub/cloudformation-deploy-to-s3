@@ -20,7 +20,7 @@ Resources:
           BucketName: !Ref TargetBucket
 
   DeploymentResource:
-    Type: 'Custom::FrontendDeployment'
+    Type: 'AWS::CloudFormation::CustomResource'
     Properties:
       ServiceToken: !GetAtt SiteSource.Arn
       TargetBucket: !Ref TargetBucket
