@@ -1,7 +1,7 @@
 BUCKET_NAME := desole-packaging
 STACK_NAME := s3-deployment-example-2
 
-output.yml: template.yml src/*
+output.yml: template.yml web-site/*
 	aws cloudformation package --template-file $< --output-template-file $@ --s3-bucket=$(BUCKET_NAME)
 
 deploy: output.yml
