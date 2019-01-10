@@ -1,86 +1,35 @@
-Description: Frontend Deploy Layer
+AWSTemplateFormatVersion: 2010-09-09
+Description: S3 Deployment Layer
 Parameters:
   AllowedPrincipal:
     Type: String
     Description: Account principal allowed to deploy this layer
     Default: '*'
+  DeploymentBucketName:
+    Type: String
+  DeploymentKey:
+    Type: String
 
 Resources:
-  FrontendLayer:
+  S3DeploymentLayer:
     Type: AWS::Lambda::LayerVersion
     Properties:
       CompatibleRuntimes:
         - python3.6
-      Description: Frontend Deploy for AWS Lambda
-      LayerName: frontend-deploy
+      Description: S3 Deployment Layer
+      LayerName: s3-deployment
       LicenseInfo: MIT
       Content:
-        S3Bucket: DEPLOYMENT_BUCKET_NAME
-        S3Key: DEPLOYMENT_KEY/layer.zip
+        S3Bucket: !Ref DeploymentBucketName
+        S3Key: !Ref DeploymentKey
 
   DeploymentPermission:
     Type: AWS::Lambda::LayerVersionPermission
     Properties:
       Action: lambda:GetLayerVersion
-      LayerVersionArn: !Ref FrontendLayer
+      LayerVersionArn: !Ref S3DeploymentLayer
       Principal: !Ref AllowedPrincipal
 
-  TargetBucket:
-    Type: AWS::S3::Bucket
-
-  LambdaRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Action: 'sts:AssumeRole'
-            Principal:
-              Service: lambda.amazonaws.com
-      Policies:
-        - PolicyName: WriteCloudWatchLogs
-          PolicyDocument: 
-            Version: '2012-10-17'
-            Statement: 
-              - Effect: Allow
-                Action:
-                  - 'logs:CreateLogGroup'
-                  - 'logs:CreateLogStream'
-                  - 'logs:PutLogEvents'
-                Resource: 'arn:aws:logs:*:*:*'
-        - PolicyName: TargetBucketAcces
-          PolicyDocument: 
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 's3:ListBucket'
-                Resource: !GetAtt TargetBucket.Arn
-              - Effect: Allow
-                Action:
-                  - "s3:PutObject"
-                  - "s3:GetObject"
-                  - "s3:DeleteObject"
-                Resource: !Sub "${TargetBucket.Arn}/*"
-  
-  LambdaFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      Layers: 
-        - !Ref FrontendLayer
-      Code:
-        S3Bucket: DEPLOYMENT_BUCKET_NAME
-        S3Key: DEPLOYMENT_KEY/function.zip
-      Runtime: python3.6 
-      Handler: deployer.handler
-      Role: !GetAtt LambdaRole.Arn
-      Environment:
-        Variables:
-          TARGET_BUCKET: !Ref TargetBucket
-
 Outputs:
-  FrontendLayer: 
-    Value: !Ref FrontendLayer
-  LambdaFunction:
-    Value: !Ref LambdaFunction
+  Arn: 
+    Value: !Ref S3DeploymentLayer

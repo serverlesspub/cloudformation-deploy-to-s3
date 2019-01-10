@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Frontend Deploy Example
+
+Resources:
+  TargetBucket:
+    Type: AWS::S3::Bucket
+
+  SiteSource:
+    Type: AWS::Serverless::Function
+    Properties:
+      Layers: 
+        - arn:aws:lambda:us-east-1:145266761615:layer:s3-deployment:1
+      CodeUri: src/
+      AutoPublishAlias: live
+      Runtime: python3.6 
+      Handler: deployer.resource_handler
+      Policies:
+      - S3CrudPolicy:
+          BucketName: !Ref TargetBucket
+
+  DeploymentResource:
+    Type: 'Custom::FrontendDeployment'
+    Properties:
+      ServiceToken: !GetAtt SiteSource.Arn
+      TargetBucket: !Ref TargetBucket
+      Acl: 'private'
+      CacheControlMaxAge: 700
+      Version: !Ref "SiteSource.Version"
+
+Outputs:
+  DestinationBucket:
+    Value: !Ref TargetBucket

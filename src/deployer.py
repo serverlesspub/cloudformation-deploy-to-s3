@@ -1,15 +1,28 @@
 import os
 import boto3
 import mimetypes
+import json
+import requests
+
 s3 = boto3.resource('s3')
 
-def handler(event, context):
-  target_bucket = os.environ['TARGET_BUCKET']
-  lambda_src = os.getcwd()
-  acl = 'private'
-  cacheControl = 'max-age=600'
-  
-  upload(lambda_src, target_bucket, acl, cacheControl)
+def resource_handler(event, context):
+  print(event)
+  try:
+    target_bucket = event['ResourceProperties']['TargetBucket']
+    lambda_src = os.getcwd()
+    acl = event['ResourceProperties']['Acl']
+    cacheControl = 'max-age=' + event['ResourceProperties']['CacheControlMaxAge']
+    print(event['RequestType'])
+    if event['RequestType'] == 'Create' or event['RequestType'] == 'Update':
+      print('uploading')
+      upload(lambda_src, target_bucket, acl, cacheControl)
+    else:
+      print('ignoring')
+    
+    send_result(event)
+  except Exception as err:
+    send_error(event, err)
   return event
 
 def upload(lambda_src, target_bucket, acl, cacheControl):
@@ -23,3 +36,26 @@ def upload(lambda_src, target_bucket, acl, cacheControl):
 def upload_file(source, bucket, key, s3lib, acl, cacheControl, contentType):
     print('uploading from {} {} {}'.format(source, bucket, key))
     s3lib.Object(bucket, key).put(ACL=acl,Body=open(source, 'rb'),CacheControl=cacheControl,ContentType=contentType)
+
+def send_result(event):
+  response_body = json.dumps({
+    'Status': 'SUCCESS',
+		'PhysicalResourceId': 'zeka123',
+		'StackId': event['StackId'],
+		'RequestId': event['RequestId'],
+		'LogicalResourceId': event['LogicalResourceId']
+  })
+  print(response_body)
+  requests.put(event['ResponseURL'], data = response_body)
+
+def send_error(event, error):
+  response_body = json.dumps({
+    'Status': 'FAILED',
+    'Reason': str(error),
+		'PhysicalResourceId': event['PhysicalResourceId'] or event['RequestId'],
+		'StackId': event['StackId'],
+		'RequestId': event['RequestId'],
+		'LogicalResourceId': event['LogicalResourceId']
+  })
+  print(response_body)
+  requests.put(event['ResponseURL'], data = response_body)
