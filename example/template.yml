@@ -39,13 +39,8 @@ Resources:
       # give the function access to the bucket where it
       # will upload the assets
       Policies:
-        - Version: '2012-10-17' # Policy Document
-          Statement:
-            - Effect: Allow
-              Action:
-              - s3:PutObject
-              - s3:PutObjectACL
-              Resource: !Sub 'arn:aws:s3:::${TargetBucket}/*'
+        - S3FullAccessPolicy:
+            BucketName: !Ref TargetBucket
 
   # This is a custom resource that
   # will trigger the function during deployment

@@ -11,4 +11,3 @@ output.yml: template.yml web-site/*
 deploy: output.yml
 	aws cloudformation deploy --template-file $< --stack-name $(STACK_NAME) --capabilities CAPABILITY_IAM --region $(REGION)
 	aws cloudformation describe-stacks --stack-name $(STACK_NAME) --query Stacks[].Outputs[].OutputValue --output text --region $(REGION)
-	aws s3 ls s3://$(shell aws cloudformation describe-stacks --stack-name $(STACK_NAME) --query Stacks[].Outputs[].OutputValue --output text) --recursive
