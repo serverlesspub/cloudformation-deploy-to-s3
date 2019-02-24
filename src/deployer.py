@@ -3,6 +3,8 @@ import boto3
 import mimetypes
 import json
 import requests
+import subprocess
+import tempfile
 
 s3 = boto3.resource('s3')
 
@@ -16,6 +18,10 @@ def resource_handler(event, context):
         event['ResourceProperties']['CacheControlMaxAge']
     print(event['RequestType'])
     if event['RequestType'] == 'Create' or event['RequestType'] == 'Update':
+      
+      if 'Substitutions' in event['ResourceProperties'].keys():
+        lambda_src = apply_substitutions(event['ResourceProperties']['Substitutions'])
+
       print('uploading')
       upload(lambda_src, target_bucket, acl, cacheControl)
     else:
@@ -72,3 +78,39 @@ def get_physical_resource_id(event):
     return event['PhysicalResourceId']
   else:
     return event['RequestId']
+
+def apply_substitutions(substitutions):
+  if not 'Values' in substitutions.keys():
+    raise ValueError('Substitutions must contain Values')
+
+  if not isinstance(substitutions['Values'], dict):
+    raise ValueError('Substitutions.Values must be an Object')
+
+  if len(substitutions['Values']) < 1:
+    raise ValueError('Substitutions.Values must not be empty')
+
+  if not 'FilePattern' in substitutions.keys():
+    raise ValueError('Substitutions must contain FilePattern')
+
+  if not isinstance(substitutions['FilePattern'], str):
+    raise ValueError('Substitutions.FilePattern must be a String')
+
+  if len(substitutions['FilePattern']) < 1:
+    raise ValueError('Substitutions.FilePattern must not be empty')
+
+  values = substitutions['Values']
+  file_pattern = substitutions['FilePattern']
+
+  temp_dir = tempfile.mkdtemp()
+  sub_dir = os.path.join(temp_dir, 'src')
+  subprocess.run(['cp', '-r', os.getcwd(), sub_dir])
+
+  full_path = os.path.join(sub_dir, 'index.html')
+  sed_script = ';'.join(list(map(lambda key: str.format('s/{}/{}/g', sed_escape(key), sed_escape(values[key])), values.keys())))
+  print('sed script', sed_script)
+  subprocess.run(['sed', sed_script, '-i', full_path], cwd=tempfile.gettempdir(), check=True)
+
+  return sub_dir
+
+def sed_escape(text):
+ return text.replace('/', '\\/')

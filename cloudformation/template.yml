@@ -13,7 +13,7 @@ Resources:
       CompatibleRuntimes:
         - python3.6
       Description: S3 Deployment Layer
-      LayerName: s3-deployment
+      LayerName: !Ref AWS::StackName
       LicenseInfo: MIT
       Content:
         S3Bucket: !Ref DeploymentBucketName
