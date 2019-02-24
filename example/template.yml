@@ -16,7 +16,7 @@ Resources:
       Layers: 
         # the layer contains the deployment code 
         # so the function "source" can just contain the web assets
-        - arn:aws:lambda:us-east-1:145266761615:layer:test-s3-deployment:8
+        - arn:aws:lambda:us-east-1:145266761615:layer:test-s3-deployment:18
 
       # point to directory with the assets so cloudformation can
       # package and upload them
@@ -60,7 +60,7 @@ Resources:
       Substitutions:
         FilePattern: "*.html"
         Values:
-          APP_NAME: 'Example Application' 
+          APP_NAME: 'Example Application'
           STACK_ID: !Ref AWS::StackId
       
       # Choose the ACL and caching policies
