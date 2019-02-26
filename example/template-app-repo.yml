@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Frontend Deploy Example
+
+Resources:
+  TargetBucket:
+    Type: AWS::S3::Bucket
+
+  DeploymentLayer:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location:
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:375983427419:applications/deploy-to-s3
+        SemanticVersion: 1.0.0
+      
+
+  # this function is used only during deployment, 
+  # we use the web site assets as the source of the function
+  # tricking cloudformation to pack up the web site files
+  # using the standard cloudformation package process
+  SiteSource:
+    Type: AWS::Serverless::Function
+    Properties:
+      Layers: 
+        # the layer contains the deployment code 
+        # so the function "source" can just contain the web assets
+        - !GetAtt DeploymentLayer.Outputs.Arn
+
+      # point to directory with the assets so cloudformation can
+      # package and upload them
+      CodeUri: web-site/
+
+      # really important: this will ensure that any change in 
+      # the bundled files gets deployed again. we're abusing
+      # the custom resource pipeline here, so this will be used
+      # to change parameters of the resource and re-trigger it
+      AutoPublishAlias: live
+
+      # the following two lines are required to make the layer work
+      Runtime: python3.6 
+      Handler: deployer.resource_handler
+
+      # set the timeout to something reasonable depending on
+      # how long it takes to upload your assets to S3
+      Timeout: 600
+
+      # give the function access to the bucket where it
+      # will upload the assets
+      Policies:
+        - S3FullAccessPolicy:
+            BucketName: !Ref TargetBucket
+
+  # This is a custom resource that
+  # will trigger the function during deployment
+  DeploymentResource:
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+
+      # the following two lines are required to 
+      # ensure that cloudformation will trigger the
+      # resource every time you change the bundled files
+      ServiceToken: !GetAtt SiteSource.Arn
+      Version: !Ref "SiteSource.Version"
+
+      # tell the deployer where to upload the files
+      TargetBucket: !Ref TargetBucket
+
+      Substitutions:
+        FilePattern: "*.html"
+        Values:
+          APP_NAME: 'Example Application'
+          STACK_ID: !Ref AWS::StackId
+      
+      # Choose the ACL and caching policies
+      # eg, for directly accessible web site
+      # use public-read and 10 minutes caching
+      Acl: 'public-read'
+      CacheControlMaxAge: 600
+
+
+Outputs:
+  DestinationBucket:
+    Value: !Ref TargetBucket

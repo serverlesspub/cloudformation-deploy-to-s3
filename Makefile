@@ -1,4 +1,4 @@
-DEPLOYMENT_BUCKET_NAME := desole-packaging
+DEPLOYMENT_BUCKET_NAME ?= desole-packaging
 DEPLOYMENT_KEY := $(shell echo s3-deployment-$$RANDOM.zip)
 STACK_NAME ?= s3-deployment
 
