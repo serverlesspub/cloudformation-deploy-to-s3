@@ -16,7 +16,7 @@ Resources:
       Layers: 
         # the layer contains the deployment code 
         # so the function "source" can just contain the web assets
-        - arn:aws:lambda:us-east-1:145266761615:layer:test-s3-deployment:18
+        - arn:aws:lambda:us-east-1:145266761615:layer:s3-deployment:5
 
       # point to directory with the assets so cloudformation can
       # package and upload them

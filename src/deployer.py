@@ -112,11 +112,9 @@ def apply_substitutions(substitutions, temp_dir):
   subprocess.run(['cp', '-r', os.getcwd(), temp_dir])
 
   for full_path in pathlib.Path(temp_dir).glob(file_pattern):
-    print('substituting in ', full_path)
     replace_with_command = lambda key: 's/\\${%s}/%s/g'% (sed_escape(key), sed_escape(values[key]))
     replacements = list(map(replace_with_command, values.keys()))
     sed_script = ';'.join(replacements)
-    print('sed script', sed_script)
     subprocess.run(['sed', sed_script, '-i', str(full_path)], cwd=tempfile.gettempdir(), check=True)
 
 def sed_escape(text):
