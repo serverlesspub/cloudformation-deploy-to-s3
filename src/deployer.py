@@ -9,6 +9,7 @@ import pathlib
 import shutil
 
 s3 = boto3.resource('s3')
+defaultContentType = 'application/octet-stream'
 
 def resource_handler(event, context):
   print(event)
@@ -53,6 +54,7 @@ def upload(lambda_src, target_bucket, acl, cacheControl):
 
 def upload_file(source, bucket, key, s3lib, acl, cacheControl, contentType):
     print('uploading from {} {} {}'.format(source, bucket, key))
+    contentType = contentType or defaultContentType
     s3lib.Object(bucket, key).put(ACL=acl, Body=open(source, 'rb'),
                                   CacheControl=cacheControl, ContentType=contentType)
 
