@@ -1,4 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+
 Description: S3 Deployment Layer
 Parameters:
   DeploymentBucketName:
@@ -12,6 +14,7 @@ Resources:
     Properties:
       CompatibleRuntimes:
         - python3.6
+        - python3.7
       Description: S3 Deployment Layer
       LayerName: !Ref AWS::StackName
       LicenseInfo: MIT
