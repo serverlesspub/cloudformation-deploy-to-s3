@@ -2,12 +2,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Transform: 'AWS::Serverless-2016-10-31'
 
 Description: S3 Deployment Layer
-Parameters:
-  DeploymentBucketName:
-    Type: String
-  DeploymentKey:
-    Type: String
-
 Resources:
   S3DeploymentLayer:
     Type: AWS::Serverless::LayerVersion
@@ -16,11 +10,8 @@ Resources:
         - python3.6
         - python3.7
       Description: S3 Deployment Layer
-      LayerName: !Ref AWS::StackName
       LicenseInfo: MIT
-      ContentUri:
-        Bucket: !Ref DeploymentBucketName
-        Key: !Ref DeploymentKey
+      ContentUri: ../build/python
       RetentionPolicy: Retain
 
   DeploymentPermission:
@@ -33,3 +24,18 @@ Resources:
 Outputs:
   Arn: 
     Value: !Ref S3DeploymentLayer
+
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: deploy-to-s3 
+    Description: >
+      Deploy and publish Frontend SPA apps, UI components, static websites and MicroFrontends to S3 
+      and Serverless Application Repository using this Lambda Layer component
+    Author: Aleksandar Simovic
+    SpdxLicenseId: MIT 
+    LicenseUrl: ../LICENSE.txt
+    ReadmeUrl: README-SAR.md 
+    Labels: ['deploy', 's3', 'lambda', 'layer', 'frontend']
+    HomePageUrl: https://serverless.pub/deploy-frontend-to-s3-and-sar/
+    SemanticVersion: 2.3.0
+    SourceCodeUrl: https://github.com/serverlesspub/cloudformation-deploy-to-s3
