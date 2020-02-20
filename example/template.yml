@@ -5,13 +5,16 @@ Description: Frontend Deploy Example
 Resources:
   TargetBucket:
     Type: AWS::S3::Bucket
+    Properties:
+      WebsiteConfiguration:
+        IndexDocument: index.html
 
   DeploymentLayer:
     Type: AWS::Serverless::Application
     Properties:
       Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:375983427419:applications/deploy-to-s3
-        SemanticVersion: 1.0.0
+        SemanticVersion: 2.4.0
       
 
   # this function is used only during deployment, 
@@ -81,3 +84,5 @@ Resources:
 Outputs:
   DestinationBucket:
     Value: !Ref TargetBucket
+  DestinationUrl:
+    Value: !GetAtt TargetBucket.WebsiteURL

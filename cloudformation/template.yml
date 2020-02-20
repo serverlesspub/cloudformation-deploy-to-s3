@@ -11,7 +11,7 @@ Resources:
         - python3.7
       Description: S3 Deployment Layer
       LicenseInfo: MIT
-      ContentUri: ../build/python
+      ContentUri: ../build
       RetentionPolicy: Retain
 
   DeploymentPermission:
@@ -37,5 +37,5 @@ Metadata:
     ReadmeUrl: README-SAR.md 
     Labels: ['deploy', 's3', 'lambda', 'layer', 'frontend']
     HomePageUrl: https://serverless.pub/deploy-frontend-to-s3-and-sar/
-    SemanticVersion: 2.3.0
+    SemanticVersion: 2.4.0
     SourceCodeUrl: https://github.com/serverlesspub/cloudformation-deploy-to-s3
