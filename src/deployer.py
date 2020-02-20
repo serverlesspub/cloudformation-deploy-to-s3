@@ -29,6 +29,8 @@ def resource_handler(event, context):
 
       print('uploading')
       upload(lambda_src, target_bucket, acl, cacheControl)
+    elif event['RequestType'] == 'Delete':
+      print('delete')
     else:
       print('ignoring')
 
@@ -58,6 +60,13 @@ def upload_file(source, bucket, key, s3lib, acl, cacheControl, contentType):
     s3lib.Object(bucket, key).put(ACL=acl, Body=open(source, 'rb'),
                                   CacheControl=cacheControl, ContentType=contentType)
 
+def delete(lambda_src, target_bucket, s3lib):
+  for folder, subs, files in os.walk(lambda_src):
+    for filename in files:
+        source_file_path = os.path.join(folder, filename)
+        destination_s3_key = os.path.relpath(source_file_path, lambda_src)
+        print('deleting file {} from {}'.format(destination_s3_key, target_bucket))
+        s3lib.Object(target_bucket, destination_s3_key).delete()
 
 def send_result(event):
   response_body = json.dumps({
