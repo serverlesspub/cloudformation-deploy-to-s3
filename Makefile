@@ -16,3 +16,6 @@ output.yml: cloudformation/template.yml build/python/requests build/python/deplo
 deploy: output.yml
 	aws cloudformation deploy --template-file $< --stack-name $(STACK_NAME) --capabilities CAPABILITY_IAM
 	aws cloudformation describe-stacks --stack-name $(STACK_NAME) --query Stacks[].Outputs[].OutputValue --output text
+
+publish: output.yml
+	sam publish -t output.yml
