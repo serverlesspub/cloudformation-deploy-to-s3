@@ -30,7 +30,7 @@ def resource_handler(event, context):
       print('uploading')
       upload(lambda_src, target_bucket, acl, cacheControl)
     elif event['RequestType'] == 'Delete':
-      print('delete')
+      delete(lambda_src, target_bucket, s3)
     else:
       print('ignoring')
 

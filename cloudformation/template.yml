@@ -10,16 +10,10 @@ Resources:
         - python3.6
         - python3.7
       Description: S3 Deployment Layer
+      LayerName: !Ref AWS::StackName
       LicenseInfo: MIT
       ContentUri: ../build
       RetentionPolicy: Retain
-
-  DeploymentPermission:
-    Type: AWS::Lambda::LayerVersionPermission
-    Properties:
-      Action: lambda:GetLayerVersion
-      LayerVersionArn: !Ref S3DeploymentLayer
-      Principal: '*'
 
 Outputs:
   Arn: 
@@ -37,5 +31,5 @@ Metadata:
     ReadmeUrl: README-SAR.md 
     Labels: ['deploy', 's3', 'lambda', 'layer', 'frontend']
     HomePageUrl: https://serverless.pub/deploy-frontend-to-s3-and-sar/
-    SemanticVersion: 2.4.0
+    SemanticVersion: 2.4.1
     SourceCodeUrl: https://github.com/serverlesspub/cloudformation-deploy-to-s3
