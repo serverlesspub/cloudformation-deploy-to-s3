@@ -22,7 +22,7 @@ The easiest place to deploy this is from the [Serverless App Repository](https:/
     Properties:
       Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:375983427419:applications/deploy-to-s3
-        SemanticVersion: 2.4.1
+        SemanticVersion: 2.4.2
 
   SiteSource:
     Type: AWS::Serverless::Function
